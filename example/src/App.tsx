@@ -5,17 +5,12 @@ import {TextAnnotator, TokenAnnotator} from '../../src'
 
 const TEXT = `On Monday night , Mr. Fallon will have a co-host for the first time : The rapper Cardi B , who just released her first album, " Invasion of Privacy . "`
 
-const TAG_COLORS = {
-  ORG: '#00ffa2',
-  PERSON: '#84d2ff',
-}
-
 const Card = ({children}) => (
   <div
     style={{
       boxShadow: '0 2px 4px rgba(0,0,0,.1)',
       margin: 6,
-      maxWidth: 500,
+      maxWidth: 800,
       padding: 16,
     }}
   >
@@ -25,8 +20,7 @@ const Card = ({children}) => (
 
 class App extends React.Component<any, any> {
   state = {
-    value: [{start: 17, end: 19, tag: 'PERSON'}],
-    tag: 'PERSON',
+    value: [],
   }
 
   handleChange = value => {
@@ -46,56 +40,27 @@ class App extends React.Component<any, any> {
         <div style={{display: 'flex', marginBottom: 24}}>
           <Card>
             <h4>Default</h4>
-            <select onChange={this.handleTagChange} value={this.state.tag}>
-              <option value="ORG">ORG</option>
-              <option value="PERSON">PERSON</option>
-            </select>
-            <TokenAnnotator
+            <TextAnnotator
               style={{
-                fontFamily: 'IBM Plex Sans',
-                maxWidth: 500,
+                maxWidth: 800,
                 lineHeight: 1.5,
               }}
-              tokens={TEXT.split(' ')}
+              content={TEXT}
+              tags={['product', 'date', 'person']}
               value={this.state.value}
               onChange={this.handleChange}
-              getSpan={span => ({
-                ...span,
-                tag: this.state.tag,
-                color: TAG_COLORS[this.state.tag],
-              })}
             />
           </Card>
-          <Card>
-            <h4>Custom rendered mark</h4>
-            <select onChange={this.handleTagChange} value={this.state.tag}>
-              <option value="ORG">ORG</option>
-              <option value="PERSON">PERSON</option>
-            </select>
-            <TokenAnnotator
-              style={{
-                fontFamily: 'IBM Plex Sans',
-                maxWidth: 500,
-                lineHeight: 1.5,
-              }}
-              tokens={TEXT.split(' ')}
-              value={this.state.value}
-              onChange={this.handleChange}
-              getSpan={span => ({
-                ...span,
-                tag: this.state.tag,
-                color: TAG_COLORS[this.state.tag],
-              })}
-              renderMark={props => (
-                <mark
-                  key={props.key}
-                  onClick={() => props.onClick({start: props.start, end: props.end})}
-                >
-                  {props.content} [{props.tag}]
-                </mark>
-              )}
-            />
-          </Card>
+          {/* <Card>
+            {this.state.value.map((entity, index) => {
+              return (
+                <div key={index}>
+                  <span style={{margin:'10px', width:'200px', background:entity.color}}>{entity.tag}</span>
+                  <span>{entity.text}</span>
+                </div>
+              );
+            })}
+          </Card> */}
         </div>
         <Card>
           <h4>Current Value</h4>
