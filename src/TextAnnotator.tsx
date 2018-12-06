@@ -3,26 +3,15 @@ import * as React from 'react'
 import Mark from './Mark'
 import {selectionIsEmpty, selectionIsBackwards, splitWithOffsets} from './utils'
 import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import TextField from '@material-ui/core/TextField';
-import 'react-contexify/dist/ReactContexify.min.css';
-import { withStyles } from '@material-ui/core/styles';
-
-const styles = theme => ({
-  paper: {
-    display: 'inline-block',
-    position:'absolute',
-    left: '0px',
-    top: '0px'
-  },
-});
 
 const TAG_COLORS = {
-  product: '#00ffa2',
+  product: '#00FF00',
   date: '#FF0000',
-  person: '#84d2ff',
+  person: '#008800',
+  job: '#84d2ff'
 }
 
 const Split = props => {
@@ -46,7 +35,6 @@ interface TextAnnotatorProps {
   tags: any[]
   onChange: (any) => any
   getSpan?: (any) => any
-  classes: any
   // determine whether to overwrite or leave intersecting ranges.
 }
 
@@ -93,7 +81,6 @@ class TextAnnotator extends React.Component<TextAnnotatorProps, TextAnnotatorSta
   }
 
   handleMouseUp = (e) => {
-    this.setState({open: false})
     if (!this.props.onChange) return
 
     const selection = window.getSelection()
@@ -176,28 +163,44 @@ class TextAnnotator extends React.Component<TextAnnotatorProps, TextAnnotatorSta
   })
 
   render() {
-    const { classes } = this.props;
     const {content, value, style} = this.props
     const splits = splitWithOffsets(content, value)
     return (
       <React.Fragment>
-        {this.state.open && <div ref={this.menuRef} style={{left: `${this.state.clickX}px`, top: `${this.state.clickY + 10}px`}} className={classes.paper}><Paper>
-          <MenuList>
-            {this.state.tags.map((tag, index) => <MenuItem key={index} onClick={event => this.handleMenuItemClick(tag, index)}>{tag}</MenuItem>)}
-            {
-              this.state.adding ?
-              <form onSubmit={this.handleSubmit}>
-                <TextField
-                  defaultValue=""
-                  margin="normal"
-                  value={this.state.inputText}
-                  onChange={this.handleChange}
-                />
-              </form> : 
-              <MenuItem onClick={this.handleAddTag}>add</MenuItem>
-            }
-          </MenuList>
-        </Paper></div>}
+        {this.state.open && 
+          <div 
+            ref={this.menuRef} 
+            style={{
+              left: `${this.state.clickX}px`, 
+              top: `${this.state.clickY + 10}px`,
+              display: 'inline-block',
+              position:'absolute',
+            }}
+          >
+            <Paper>
+              <MenuList>
+                {this.state.tags.map((tag, index) => <MenuItem key={index} onClick={event => this.handleMenuItemClick(tag, index)}>{tag}</MenuItem>)}
+                {
+                  this.state.adding ?
+                  <form onSubmit={this.handleSubmit}>
+                    <TextField
+                      defaultValue=""
+                      margin="normal"
+                      value={this.state.inputText}
+                      onChange={this.handleChange}
+                    />
+                  </form> : 
+                  <MenuItem onClick={this.handleAddTag}>add</MenuItem>
+                }
+              </MenuList>
+            </Paper>
+          </div>
+        }
+        tags : {this.state.tags.map((tag, index) => 
+          <span key={index} style={{backgroundColor: TAG_COLORS[tag], margin: '3px'}}>
+            {tag}
+          </span>)
+        }
         <div style={style} ref={this.rootRef}>
           {splits.map(split => (
             <Split key={`${split.start}-${split.end}`} {...split} onClick={this.handleSplitClick} />
@@ -208,5 +211,5 @@ class TextAnnotator extends React.Component<TextAnnotatorProps, TextAnnotatorSta
   }
 }
 
-export default withStyles(styles)(TextAnnotator)
+export default TextAnnotator
 
